@@ -1,19 +1,24 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import styles from './home.module.css';
 import { useFormik } from 'formik';
+import axios from 'axios';
+import { useHistory } from "react-router-dom";
+import AlertComponent from '../components/Utilities/AlertComponent';
 
 const Home = () => {
+    let history = useHistory();
+    const alertRef = useRef();
 
     const validate = values => {
         const errors = {};
         if (!values.password) {
-            errors.password = 'Required';
-        } else if (values.password.length > 15) {
-            errors.password = 'Must be 15 characters or less';
+            errors.password = 'Password is required';
+        } else if (values.password.length < 7) {
+            errors.password = 'Must be 7 characters or more';
         }
 
         if (!values.email) {
-            errors.email = 'Required';
+            errors.email = 'Email is required';
         } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
             errors.email = 'Invalid email address';
         }
@@ -21,16 +26,25 @@ const Home = () => {
         return errors;
     };
 
+    const initialFormValues = {
+        email: '',
+        password: '',
+    }
 
     const formik = useFormik({
-        initialValues: {
-            email: '',
-            password: '',
-
-        },
+        initialValues: initialFormValues,
         validate,
-        onSubmit: values => {
-            alert(JSON.stringify(values, null, 2));
+        onSubmit: async (values) => {
+
+            try {
+                const result = await axios.post(`${process.env.REACT_APP_BASE_URL}/login`, values);
+                localStorage.setItem('token', result.data);
+                history.push("/device");
+
+            } catch (error) {
+                const { response } = error;
+                alertRef.current.showAlert(response.data);
+            }
         },
     });
 
@@ -53,7 +67,7 @@ const Home = () => {
                                 className="bg-gray-200  rounded-sm  py-2 px-4 w-full outline-none"
                             />
                         </div>
-                        {formik.errors.email ? <div className="text-red-700">{formik.errors.email}</div> : null}
+                        {formik.errors.email ? <div className="text-red-700 text-sm">{formik.errors.email}</div> : null}
                     </div>
                     <div className="mb-8">
                         <div className="flex items-center bg-gray-200">
@@ -69,11 +83,12 @@ const Home = () => {
                                 className="bg-gray-200 rounded-sm  py-2 px-4 w-full outline-none"
                             />
                         </div>
-                        {formik.errors.password ? <div className="text-red-700">{formik.errors.password}</div> : null}
+                        {formik.errors.password ? <div className="text-red-700 text-sm">{formik.errors.password}</div> : null}
                     </div>
                     <button type="submit" className="bg-blue-800 text-white py-2">Login</button>
                 </form>
             </div>
+            <AlertComponent ref={alertRef} />
         </div>
     )
 }

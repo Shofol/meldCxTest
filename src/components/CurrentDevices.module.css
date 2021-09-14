@@ -1,0 +1,44 @@
+.container {
+  width: 26em;
+  height: 26em;
+  margin: auto;
+  position: relative;
+}
+.circleContainer {
+  width: 26em;
+  height: 26em;
+  border-radius: 50%;
+  margin: auto;
+  position: relative;
+  animation: myOrbit 8s linear infinite;
+}
+
+.centerCircle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.circle {
+  position: absolute;
+  width: 5em;
+  height: 5em;
+  background: white;
+  border-radius: 50%;
+  left: 10.5em;
+  top: 10.5em;
+}
+
+@keyframes myOrbit {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}
