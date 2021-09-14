@@ -43,7 +43,7 @@ const Home = () => {
 
             } catch (error) {
                 const { response } = error;
-                alertRef.current.showAlert(response.data);
+                alertRef.current.showAlert('error', response.data);
             }
         },
     });
